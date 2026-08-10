@@ -1,0 +1,38 @@
+{
+  "build_config": {
+    "research_change_threshold_pp": 0.5,
+    "change_epsilon_pp": 1e-06,
+    "holdings_proxy_min_coverage": 0.7,
+    "holdings_proxy_max_coverage": 1.2,
+    "treasury_primary_modified_duration": 8.5,
+    "treasury_duration_sensitivity_low": 7.5,
+    "treasury_duration_sensitivity_high": 9.5,
+    "max_change_gap_months": 6
+  },
+  "method_warning": "The 30% Treasury leg is a synthetic duration/carry proxy derived from H.15 DGS10 yield, not an official bond total-return series.",
+  "event_rows": 32907,
+  "unique_event_ids": 32907,
+  "event_date_min": "2002-08-31",
+  "event_date_max": "2025-11-30",
+  "allocation_available": 17679,
+  "allocation_quality_counts": {
+    "missing": 15228,
+    "partial": 11633,
+    "proxy": 4741,
+    "high": 1305
+  },
+  "allocation_source_counts": {
+    "unavailable": 15228,
+    "reported_summary": 12938,
+    "holdings_proxy_high_confidence": 4741
+  },
+  "change_events": 11409,
+  "research_change_events": 9693,
+  "eligible_future_6m_events": 10770,
+  "specific_manager_events": 12754,
+  "fallback_manager_events": 20153,
+  "fund_return_date_min": "1998-06-30",
+  "fund_return_date_max": "2025-12-31",
+  "market_date_min": "1997-12-31",
+  "market_date_max": "2025-12-31"
+}
