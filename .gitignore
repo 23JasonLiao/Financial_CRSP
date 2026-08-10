@@ -1,0 +1,8 @@
+# 1. 忽略 data/ 目錄下「所有層級」的 .csv 檔
+data/**/*.csv
+
+# 2. （可選）忽略 Python 快取檔與虛擬環境，維護 repo 乾淨
+__pycache__/
+*.pyc
+.env
+.venv/
