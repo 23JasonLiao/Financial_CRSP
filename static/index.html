@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fin - Balanced Fund Event Quantification</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">FIN · STEP 1</div>
+      <h1>Balanced Fund 配置事件量化</h1>
+      <p>Manager / Team-Family × Portfolio × Observed Report Month</p>
+    </div>
+    <div class="method-pill" id="benchmarkWarning">載入方法資訊...</div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <section>
+        <h2>分析對象</h2>
+        <label>經理人 / Team / Family</label>
+        <input id="entitySearch" placeholder="輸入名稱搜尋" />
+        <select id="entitySelect" size="8"></select>
+
+        <label>Portfolio</label>
+        <select id="portfolioSelect"><option value="">全部 Portfolio</option></select>
+      </section>
+
+      <section>
+        <h2>事件條件</h2>
+        <label>開始月份</label>
+        <input id="startDate" type="month" />
+        <label>結束月份</label>
+        <input id="endDate" type="month" />
+        <label class="check"><input id="onlyChanges" type="checkbox" checked /> 只看有配置變化</label>
+        <label>最小配置變動 L1（百分點）</label>
+        <input id="minChange" type="number" min="0" step="0.5" value="0" />
+        <button id="applyBtn">套用</button>
+      </section>
+
+      <section class="legend-box">
+        <h2>嚴謹性規則</h2>
+        <p>• 原始 report date 保留。</p>
+        <p>• 月底只是共同 month key。</p>
+        <p>• 沒有 report 的月份不製造假事件。</p>
+        <p>• Team / Unknown 不冒充個人，改用 Advisor / Family fallback。</p>
+        <p>• 6M outcome = t+1…t+6 複利。</p>
+      </section>
+    </aside>
+
+    <main class="content">
+      <section class="kpis">
+        <div class="kpi"><span>Events</span><strong id="kpiEvents">-</strong></div>
+        <div class="kpi"><span>Allocation 可用</span><strong id="kpiAlloc">-</strong></div>
+        <div class="kpi"><span>配置變動 Events</span><strong id="kpiChanges">-</strong></div>
+        <div class="kpi"><span>可算 Future 6M</span><strong id="kpiEligible">-</strong></div>
+      </section>
+
+      <section class="card hierarchy-card">
+        <div class="card-head">
+          <div><h2>Family → Portfolio → Manager / Team fallback</h2><p>對應你附件中的層級關係；Team Managed / Unknown 會明確標成 fallback。</p></div>
+        </div>
+        <div id="hierarchyView" class="hierarchy-view"></div>
+      </section>
+
+      <section class="grid two">
+        <div class="card">
+          <div class="card-head"><div><h2>股 / 債 / 現金部位</h2><p>只在實際有 report 的月份放節點，連線方便看長期變化。</p></div></div>
+          <svg id="allocationChart"></svg>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h2>配置變動</h2><p>ΔStock / ΔBond / ΔCash（percentage points）</p></div></div>
+          <svg id="changeChart"></svg>
+        </div>
+      </section>
+
+      <section class="grid two">
+        <div class="card">
+          <div class="card-head"><div><h2>月報酬：基金 vs 70/30 Proxy</h2><p>基金 gross ≈ mret + exp_ratio/12；70/30 的 Treasury leg 目前是 yield-based proxy。</p></div></div>
+          <svg id="returnChart"></svg>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h2>Event：變動幅度 vs Future 6M Excess</h2><p>點擊圓點可看完整 event detail。</p></div></div>
+          <svg id="eventScatter"></svg>
+        </div>
+      </section>
+
+      <section class="grid two bottom-grid">
+        <div class="card">
+          <div class="card-head"><div><h2>事件清單</h2><p>預設依時間排列；資料品質與 fallback 會一起顯示。</p></div></div>
+          <div class="table-wrap"><table id="eventTable"><thead><tr>
+            <th>Month</th><th>Entity</th><th>ΔStock</th><th>ΔBond</th><th>ΔCash</th><th>6M Excess</th><th>Quality</th>
+          </tr></thead><tbody></tbody></table></div>
+        </div>
+        <div class="card detail-card">
+          <div class="card-head"><div><h2>Event Detail</h2><p>選一筆事件查看原始 report date、配置來源、6M outcome 與 baseline。</p></div></div>
+          <div id="eventDetail" class="detail-empty">尚未選擇事件</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="tooltip" class="tooltip"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
