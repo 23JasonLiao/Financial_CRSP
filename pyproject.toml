@@ -1,0 +1,10 @@
+[project]
+name = "fin-event-step1-code-package"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115,<1.0",
+    "numpy>=1.24,<3.0",
+    "pandas>=2.0,<3.0",
+    "uvicorn[standard]>=0.30,<1.0",
+]
