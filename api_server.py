@@ -43,6 +43,22 @@ def safe_text(items: list[str]) -> str | None:
     return items[0] if items else None
 
 
+def parse_query_date(value: str, field_name: str) -> pd.Timestamp:
+    try:
+        ts = pd.Timestamp(value)
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f"{field_name} must be a valid date (YYYY-MM-DD)",
+        ) from exc
+    if pd.isna(ts):
+        raise HTTPException(
+            status_code=422,
+            detail=f"{field_name} must be a valid date (YYYY-MM-DD)",
+        )
+    return ts
+
+
 def create_app(data_root: Path | str = "data") -> FastAPI:
     project_root = Path(__file__).resolve().parent
 
@@ -66,6 +82,13 @@ def create_app(data_root: Path | str = "data") -> FastAPI:
     # Keep the same frontend URL contract as the Flask version:
     # /static/app.js, /static/style.css, ...
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+    @app.exception_handler(FileNotFoundError)
+    async def missing_derived_data_handler(request: Request, exc: FileNotFoundError):
+        return JSONResponse(
+            status_code=503,
+            content={"ok": False, "error": str(exc)},
+        )
 
     @lru_cache(maxsize=1)
     def event_df() -> pd.DataFrame:
@@ -250,10 +273,10 @@ def create_app(data_root: Path | str = "data") -> FastAPI:
             df = df[df["crsp_portno"].astype(str).eq(str(portno))]
 
         if start:
-            df = df[df["month_end"] >= pd.Timestamp(start)]
+            df = df[df["month_end"] >= parse_query_date(start, "start")]
 
         if end:
-            df = df[df["month_end"] <= pd.Timestamp(end)]
+            df = df[df["month_end"] <= parse_query_date(end, "end")]
 
         if only_changes:
             df = df[
@@ -428,10 +451,10 @@ def create_app(data_root: Path | str = "data") -> FastAPI:
         end = params.get("end")
 
         if start:
-            df = df[df["month_end"] >= pd.Timestamp(start)]
+            df = df[df["month_end"] >= parse_query_date(start, "start")]
 
         if end:
-            df = df[df["month_end"] <= pd.Timestamp(end)]
+            df = df[df["month_end"] <= parse_query_date(end, "end")]
 
         return records(df)
 

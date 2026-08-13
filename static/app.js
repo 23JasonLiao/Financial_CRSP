@@ -11,7 +11,7 @@ function apiParams(){
   const entity=$("#entitySelect").value; const portno=$("#portfolioSelect").value;
   if(entity) p.set("entity",entity); if(portno) p.set("portno",portno);
   if($("#startDate").value) p.set("start",`${$("#startDate").value}-01`);
-  if($("#endDate").value){ const [y,m]=$("#endDate").value.split("-").map(Number); p.set("end",new Date(y,m,0).toISOString().slice(0,10)); }
+  if($("#endDate").value){ const [y,m]=$("#endDate").value.split("-").map(Number); const lastDay=new Date(Date.UTC(y,m,0)).getUTCDate(); p.set("end",`${y}-${String(m).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`); }
   if($("#onlyChanges").checked) p.set("only_changes","true");
   if(+("0"+$("#minChange").value)>0) p.set("min_change",$("#minChange").value);
   return p;
